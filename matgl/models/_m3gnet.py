@@ -77,6 +77,7 @@ class M3GNet(nn.Module, IOMixIn):
         field: Literal["node_feat", "edge_feat"] = "node_feat",
         include_state: bool = False,
         activation_type: Literal["swish", "tanh", "sigmoid", "softplus2", "softexp"] = "swish",
+        encoder_only: bool = False,
         **kwargs,
     ):
         """
@@ -207,6 +208,7 @@ class M3GNet(nn.Module, IOMixIn):
         self.include_states = include_state
         self.task_type = task_type
         self.is_intensive = is_intensive
+        self.encoder_only = encoder_only
 
     def forward(
         self,
@@ -254,6 +256,8 @@ class M3GNet(nn.Module, IOMixIn):
         if self.is_intensive:
             node_vec = self.readout(g)
             vec = torch.hstack([node_vec, state_feat]) if self.include_states else node_vec  # type: ignore
+            if self.encoder_only:
+                return vec
             output = self.final_layer(vec)
             if self.task_type == "classification":
                 output = self.sigmoid(output)

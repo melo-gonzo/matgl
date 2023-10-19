@@ -53,6 +53,7 @@ class MEGNet(nn.Module, IOMixIn):
         bond_expansion: BondExpansion | None = None,
         cutoff: float = 4.0,
         gauss_width: float = 0.5,
+        encoder_only: bool = False,
         **kwargs,
     ):
         """Useful defaults for all arguments have been specified based on MEGNet formation energy model.
@@ -187,6 +188,9 @@ class MEGNet(nn.Module, IOMixIn):
 
         if self.dropout:
             vec = self.dropout(vec)  # pylint: disable=E1102
+
+        if self.encoder_only:
+            return vec
 
         output = self.output_proj(vec)
         if self.is_classification:
